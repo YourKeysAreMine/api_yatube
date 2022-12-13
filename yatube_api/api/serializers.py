@@ -1,13 +1,16 @@
 from rest_framework import serializers
-from posts.models import Post, Group, Comment, User
+from posts.models import Post, Group, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault())
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+        slug_field='username'
+    )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'image', 'group', 'pub_date')
+        fields = '__all__'
         read_only_fields = ('author',)
         model = Post
 
@@ -15,23 +18,15 @@ class PostSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('id', 'title', 'slug', 'description')
+        fields = '__all__'
         model = Group
 
 
-class AuthorSerializer(serializers.ModelSerializer):
-    posts = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        fields = ('username', 'posts')
-        model = User
-
-
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault())
+    author = serializers.SlugRelatedField(read_only=True,
+                                          slug_field='username')
 
     class Meta:
-        fields = ('id', 'author', 'post', 'text', 'created')
-        read_only_fields = ('author', 'post')
         model = Comment
+        fields = '__all__'
+        read_only_fields = ('author', 'post')
